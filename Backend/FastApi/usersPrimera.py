@@ -48,38 +48,39 @@ users_list = [User(id=1, name="Gonzalo", surname="Escobar", age=22, url="/sibofi
         User(id=2, name="Federico", surname="Escobar", age=36, url="/fyge"),
         User(id=3, name="Natalia", surname="Escobar", age=28, url="/natiesc")]
 
+@app.get("/users")
+async def users():
+    return users_list
 
 # Usando Path.
 @app.get("/user/{id}")
 async def user(id:int):
     return search_user(id)
 
-""""
-@app.get("/user/{id}/{name}")
-async def user(id:int,name:str):
-    return search_user(id)
-"""
 
 # Cuarto intento de base de datos. 
 # Usando Query.
-@app.get("/userquery/")
-async def user(id:int):
+@app.get("/user/")
+async def user():
     return search_user(id)
 
-urlquery = "http://127.0.0.1:8000/userquery?id=1"
+urlquery = "http://127.0.0.1:8000/users?id=1"
 
-"""
-@app.get("/userquery/")
-async def user(id:int,name:str):
-    return search_user(id)
 
-urlquery = http://127.0.0.1:8000/userquery?id=1&name=Gonzalo
-"""
+# @app.post("/users/")
+# async def create_user(user: User):
+#     if type(search_user(user.id)) == User:
+#         return {"error":"El usuario ya existe."}
+#     else:
+#         users_list.append(user)
+#         return {"success": "Usuario creado exitosamente"}
+
+
 
 # Funcion resumen
 def search_user(id:int):
     users = filter(lambda user: user.id == id, users_list)
     try:
-        return list(users)[0]
+        return vars(list(users)[0])  # Convierte el objeto User a un diccionario
     except:
-        return {"error":"No se ha encontrado el ususario"}
+        return {"error":"No se ha encontrado el usuario"}
