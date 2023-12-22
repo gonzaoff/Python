@@ -1,9 +1,9 @@
-from fastapi import FastAPI
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-app = FastAPI()
+router = APIRouter()
 
-@app.get("f")
+@router.get("f")
 async def userjson():
     return [{"name" : "Gonza", "surname" : "Escobar", "age": 22 , "url" : "https://www.instagram.com/sibofit"},
             {"name" : "Fede", "surname" : "Escobar", "age": 29 , "url" : "https://www.instagram.com/fyges"},
@@ -21,33 +21,34 @@ users_list = [User(id=1, name="Gonzalo", surname="Escobar", age=22, url="/sibofi
         User(id=3, name="Natalia", surname="Escobar", age=28, url="/natiesc")]
 
 # Lista de Usuarios
-@app.get("/users/")
+@router.get("/users/")
 async def users():
     return users_list
 
 # Path.
-@app.get("/user/{id}")
+@router.get("/user/{id}")
 async def user(id:int):
     return search_user(id)
 
 
 # Query.
-@app.get("/user/")
+@router.get("/user/")
 async def user():
     return search_user(id)
 
 urlquery = "http://127.0.0.1:8000/users?id=1"
 
-
-@app.post("/user/")
+# Crear usuarios.
+@router.post("/user/", status_code=201)
 async def create_user(user: User):
     if type(search_user(user.id)) == User:
-        return {"error":"El usuario ya existe."}
-    else:
-        users_list.append(user)
-        return {"success": "Usuario creado exitosamente"}
+        raise HTTPException(status_code=409, detail="Usuario existente")
 
-@app.put("/user/")
+    users_list.append(user)
+    return user
+
+# Modificar usuarios completos.
+@router.put("/user/")
 async def user(user: User):
     
     found = False
@@ -56,12 +57,24 @@ async def user(user: User):
         if saved_user.id == user.id:  
             users_list[index] = user
             found = True
-            return {"success" : "Usuario modificado exitosamente"}
+            return user
 
     if not found:
-        return {"error" : "No se ha actualizado el usuario"}
+        raise HTTPException(status_code=409, detail="Usuario no modificado")
 
+# Borrando usuarios con path.
+@router.delete("/user/{id}")
+async def user(id: int):
 
+    found = False
+    
+    for index, saved_user in enumerate(users_list):
+            if saved_user.id == id:  
+                del users_list[index]
+                found = True
+                return {"success" : "Usuario eliminado exitosamente."}
+    if not found:
+        raise HTTPException(status_code=409, detail="Usuario no eliminado")
 # Funcion resumen
 def search_user(id:int):
     users = filter(lambda user: user.id == id, users_list)

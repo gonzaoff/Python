@@ -1,6 +1,12 @@
 from fastapi import FastAPI
+from routers import products,users
 
 app = FastAPI()
+
+# Routers
+
+app.include_router(products.router)
+app.include_router(users.router)
 
 @app.get("/")
 async def root():
@@ -11,7 +17,7 @@ Para inicializar servidor uvircorn:
 uvicorn nombreDelFile:variableFastAPI --reload
 '''
 
-@app.get("/url")
+@app.get("/url/")
 async def url():
     return { "url_ig":"https://instagram.com/sibofit" }
 
