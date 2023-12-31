@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 # Routers (recursos en otras carpetas)
-from routers import basicAuth, products,users
+from routers import basicAuth, products,users, jwtAuth
 
 # StaticFiles (llama recursos estaticos)
 from fastapi.staticfiles import StaticFiles
@@ -11,6 +11,8 @@ app = FastAPI()
 # Routers (recursos en otras carpetas)
 app.include_router(products.router)
 app.include_router(users.router)
+app.include_router(jwtAuth.router)
+app.include_router(basicAuth.router)
 
 # StaticFiles (llama recursos estaticos)
 app.mount("/static",StaticFiles(directory="static"),name="static")

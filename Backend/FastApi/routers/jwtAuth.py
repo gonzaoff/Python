@@ -1,5 +1,5 @@
 from os import access
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
@@ -16,7 +16,7 @@ SECRET_KEY = "e9e438aabcd27a07b3b1ba2c273d2db812f744d02c334f778bed0a6de8055a1f"
 # ESTO FALTA ROUTEARLO!!!
 
 
-app = FastAPI()
+router = APIRouter()
 
 oauth2 = OAuth2PasswordBearer(tokenUrl="login")
 
@@ -106,7 +106,7 @@ async def current_user(user: User = Depends(auth_user)):
 
 
 # LogIn
-@app.post("/login")
+@router.post("/login")
 async def login(form: OAuth2PasswordRequestForm = Depends()):
     user_db = users_db.get(form.username)
     
@@ -131,6 +131,6 @@ async def login(form: OAuth2PasswordRequestForm = Depends()):
             "token_type": "bearer"}
 
 # Mis Datos.
-@app.get("/users/me")
+@router.get("/users/me")
 async def me(user: User = Depends(current_user)):
     return user
